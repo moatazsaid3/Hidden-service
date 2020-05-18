@@ -1,133 +1,42 @@
-from Crypto.Hash import SHA512
-from Crypto.Signature import PKCS1_v1_5
-from Crypto.PublicKey import RSA
-
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey, X25519PublicKey
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-
+from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 from netfilterqueue import NetfilterQueue
 
+from Crypto.Hash import SHA512
+from Crypto.PublicKey import RSA
+from Crypto.Signature import PKCS1_v1_5
+
 import dpkt
-import random
 import socket
 import struct
-import sys
-import time
-3
 
-#generating 3 keys for the three nodes a,b,s
-keya_text = b'4p\xf8ipfD(\x99\xbb\x1d\xa2k\xeb\xaf\x05\xf0\x16\xdfGK\xb8V\xd4\xf3\x17?]S\xa0{B'
-keya = AESGCM(keya_text)
 
-keys_text = b'\xe5Q\x92r\xe2\xfc\xde!\xa5|\x19\xb5\x99\x00\xc0\\\xe8\x0fN\xff:\xefi\x0bg\xb7\xe3\x87M\xf1`\xb1'
-keys = AESGCM(keys_text)
+key = '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAruJ2zpbGhjr+LS1eiz2fMvBcOcv55vWfND+/Alz9bpuDD2xM\nMDVvKO9LTRjEwMzyJi6i5GBpcsDblDbu3LmNc2iGWW9FDmOBYDAWBQtr3UO61KMB\nIT2iT7NcQqhPZYFy+lQgAYH6WjASlYLq/4GP2qKXw1MDA8NAntFq3W3aHNWlIN2w\nddRWGUa6d/fl1lLKT4L6DsFftuY7GQfzrBOtzPBxCVv8w4mU2r+Ixergy6Qjz96G\nXPiQvze2ZaRxW5+Ob+P8TW+JOufyEzQB3r4wddjUjoHiwzj72w80oDMUS3BtiVuJ\ng0GVkJlVmKD9SuBZdIkhAQqF9WKAhy9ouJxDIwIDAQABAoIBAHXFYEjDVLH0bFM0\nKGUQfHMrVpA9gu88HZhsDU+kG68u3tW2EqCse01PyKAEvAsyeSepZFzzaE+0/KoV\nTEosUsuTalY0DocgD3IdL9b52AvLnrevhgVColmV6d2hxsYOpMVbfapGQ7gUg49X\n+LVUJPIRaK5K6s7P4GaTlKnFXornXuLRgyTFR+PLDg3/zr9MryY0ZyrA8QKhkRCR\nqnVIi9SoPgq5jGBkCW8OKH9Ad3+BfvbRTPLbNScajq6m41mM8hgrDIB6M+YQLval\nVClrW/00nPBJIu+FNWp2JpGb+OxhcSLlpTxxKw3+Nq19BgeNeVrmlaZbTEkyaalx\n9/RB2jECgYEAwFgY4GiYIrS1iMdysiedoKyEKvRMcuRs9ZFJCtHaBTxPh7j4oSS+\nmlm0l0eCODQ5ttE9s+/liwTjOlFrJXem5tdll7IEBPzh3H3mb5S2I/HkLXpyXh93\nb0e9P7CzaUQv6YJ/FESJfQKwopqXLfqrjolHUH6bedvkaD5XSqPU/H0CgYEA6MMm\nzo2z2Zg4mQ9q5eQfQ1ndcrS8/fiRcy32CxfbDqKt6X54RKaNNDxvxUA4wOhK2FNZ\nWXAf3Vq9O02stBmc3o4OyYQBSKJ3DJllf+ugAK3a6LwovkgJlgs4Jm1MEz/9lKA7\n4C7M12tdh4B1eF8vn/s7aFOnJWkAgjnbme63cB8CgYEAvZaYfqnaO2tP/FBLl5tA\n3dzuMcC3kg/h7nOUQZvzgHGgGrGSMJQdY9rEDNEpY+jmcnLwlOoDofHhX9xc9oNn\n+eWad9m56IiywDlA5/73QZruRH2LOYdenEtkGOE9Fqdlao98XyfnNVdvb/dcyK9q\nZoadypPhAE5kZvP76tBt4akCgYA+4aHVQXDqAvafWwvtCWDsyBVMTMmV7xYUQMFs\no8g5Pveu0czZ9wjEqOMlLcFnVBoMMRA9Wk4xdbcTk1tp2FWJxmT2SeQy5Dk3PSWv\nlk9Gf7FZGKQFK97zGxrTPsnDlZEDGvqyCNKsC8Rbu/eASm7KUIvvFlJch+5sQAc0\nocoKzwKBgQCPhnyC0RxYGyrM9EfFdXHkVk+M40nl8SJkrDojpzCrtGkkz1I49HvO\no/tjB+9nDCzp12JjKnaJb453DOiHep6HJsgQWjtQgkjI6l++80j+74Cc3qXls3zP\n1QMXfOSgq9VLLot9sQRnbyisUOVkYJEwMb/hKoOq7FPr2Z/rcXNa2A==\n-----END RSA PRIVATE KEY-----'
+asymmetrickeyc = RSA.importKey(key)
 
-keyb_text = b'}fd>@\xb21y\xd4\x88\xe0C\x9a\xab]\xd5cEL\xc5\xbc\xd9-YG\xc8\x8d\x08^r\xb9\xad'
-keyb = AESGCM(keyb_text)
-
-#generating 3 pub key for the three nodes a,b,s
-pubkey = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu5CGUJIk41oMpDYzZpIS\n1YV+zWje9JhP71pYmFc6bnXysYQ5L25FVQv4NJoBmXWFWMr+gadokWmKZBUoqlTZ\ngrh/42pY8Pz+WJXrNJa5wyE6rv9HoS9MGq5sS4nvt48uKzMoHfn7zrwFSifXKYZP\nvv+Fq6+fCRZh28s5Kkv2PM1xbu1zjheC0GzPwEltqJP54/axI2W4CvWraG3SLiwy\nYT3aVpSLWRInoqhHDfMQfRSsDHaUKTT01vrSPif55FCUrGbP+4rX7c/n6huG/DJN\nsBkMGnJG9A1JO0fz8YWisgdmNI8+8rIcgYRGmCLhoZq868Sn9TAX5FgdjY/3SYbD\nBQIDAQAB\n-----END PUBLIC KEY-----'
-asymmetrickeya = RSA.importKey(pubkey)
-
-pubkey = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjggW52Zpc3rQY1sQUmju\nOqKkmkQkPFdftVj1z3yspbtC2VjrOmu8MY99tR25aPU+t7TjIlVCyJbq9f6Gpt8w\n13tBqk/zi3igc+pfjs4pqyNSWcQlV2a+3l68Zp8UGWaSIKoabs6jnM+8/u0EzlAq\nwpG/jHrc/js/PuCO4ge+6oMZ9zcn/iEc1WAGHI649VeqK/yUOpPfzqsfZE52WkrH\nBLr6sxp8E/uXA8uAeF1+p0qiL7EjrF2lvDEmA7JrTLaqnwFCfRyY4IhGNYf8dAB1\n3gKbzoeE5KBLZgVEFeWuuJIuPligdlCiKwJwHm7DSS/ujoKmwx2Z3O1DgSv+65K6\nZQIDAQAB\n-----END PUBLIC KEY-----'
-asymmetrickeys = RSA.importKey(pubkey)
-
-pubkey = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruJ2zpbGhjr+LS1eiz2f\nMvBcOcv55vWfND+/Alz9bpuDD2xMMDVvKO9LTRjEwMzyJi6i5GBpcsDblDbu3LmN\nc2iGWW9FDmOBYDAWBQtr3UO61KMBIT2iT7NcQqhPZYFy+lQgAYH6WjASlYLq/4GP\n2qKXw1MDA8NAntFq3W3aHNWlIN2wddRWGUa6d/fl1lLKT4L6DsFftuY7GQfzrBOt\nzPBxCVv8w4mU2r+Ixergy6Qjz96GXPiQvze2ZaRxW5+Ob+P8TW+JOufyEzQB3r4w\nddjUjoHiwzj72w80oDMUS3BtiVuJg0GVkJlVmKD9SuBZdIkhAQqF9WKAhy9ouJxD\nIwIDAQAB\n-----END PUBLIC KEY-----'
-asymmetrickeyb = RSA.importKey(pubkey)
-
-#generating three ecdhe keys which are public keys that are used to derive 
-#a symmetric key used for encryption 
-ecdhe_cb = X25519PrivateKey.generate()
-ecdhe_cs = X25519PrivateKey.generate()
-ecdhe_ca = X25519PrivateKey.generate()
-
-#client side socket creating
-#   socket.AF_INET6    ==> address and protocol
-#   socket.SOCK_RAW    ==> socket type
-#   socket.IPPROTO_RAW ==> 
 sockfd = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_RAW)
+# Inform the Operating System that the script crafts the IP header itself
 sockfd.setsockopt(socket.IPPROTO_IPV6, socket.IP_HDRINCL, True)
-
-initial_time = 0
-final_time = 0
-
-# Run 1000 times
-counter = 1000
 
 def run():
     ip6_packet = dpkt.ip6.IP6()
 
     ip6_packet.src = socket.inet_pton(socket.AF_INET6, '0:0:0:0:0:0:0:0')
-    ip6_packet.dst = socket.inet_pton(socket.AF_INET6, '2100::103')
-
-    # Prepare Header C
-    ci_c = random.randint(0, 4294967295)
-    header_c = struct.pack(">I", ci_c)
-
-    # Prepare Header B
-    header_b = asymmetrickeyb.encrypt(keyb_text, 0)[0]
-
-    nonce_b = random.randint(0, 4294967295)
-    header_b += struct.pack(">I", nonce_b)
-
-    header_b += ecdhe_cb.public_key().public_bytes()
-
-    ci_b = random.randint(0, 4294967295)
-    header_b += struct.pack(">I", ci_b)
-
-    ip_c = socket.inet_pton(socket.AF_INET6, '2100::101')
-
-    encrypted_blob = keyb.encrypt(bytes(nonce_b), bytes(ip_c) + bytes(header_c), '')
-
-    header_b += encrypted_blob
-
-    # Prepare IP Option S
-    header_s = asymmetrickeys.encrypt(keys_text, 0)[0]
-
-    nonce_s = random.randint(0, 4294967295)
-    header_s += struct.pack(">I", nonce_s)
-
-    header_s += ecdhe_cs.public_key().public_bytes()
-
-    ci_s = random.randint(0, 4294967295)
-    header_s += struct.pack(">I", ci_s)
-
-    ip_b = socket.inet_pton(socket.AF_INET6, '2100::104')
-
-    encrypted_blob = keys.encrypt(bytes(nonce_s), bytes(ip_b) + bytes(header_b), '')
-
-    header_s += encrypted_blob
-
-    # Prepare IP Option A
-    header_a = asymmetrickeya.encrypt(keya_text, 0)[0]
-
-    nonce_a = random.randint(0, 4294967295)
-    header_a += struct.pack(">I", nonce_a)
-
-    header_a += ecdhe_ca.public_key().public_bytes()
-
-    ci_a = random.randint(0, 4294967295)
-    header_a += struct.pack(">I", ci_a)
-
-    ip_s = socket.inet_pton(socket.AF_INET6, '2100::102')
-
-    encrypted_blob = keya.encrypt(bytes(nonce_a), bytes(ip_s) + bytes(header_s), '')
-
-    header_a += encrypted_blob
+    ip6_packet.dst = socket.inet_pton(socket.AF_INET6, '2100::105')
+    
+    #this should be encrypted using the directory's public key 
+    header_a = "A server's HOSTNAME"
 
     ip6_packet.nxt = 99
     ip6_packet.p = 99
     ip6_packet.all_extension_headers = []
     ip6_packet.extension_hdrs = []
     ip6_packet.data = header_a
-    ip6_packet.plen = len(ip6_packet.data)
+    ip6_packet.plen = len(header_a)
+    
 
-    print("working")
-    # .sendto(bytes , address)
-    sockfd.sendto(bytes(ip6_packet), ('2100::103', 0))
+    sockfd.sendto(bytes(ip6_packet), ('2100::105', 0))
+
 
 def modify(packet):
     pkt = dpkt.ip6.IP6(packet.get_payload())
@@ -136,72 +45,27 @@ def modify(packet):
         packet.accept()
         return
 
-    ci = struct.unpack(">I", pkt.data[:4])[0]
+    aes_key_text = pkt.data[:256]
+    aes_key_text = asymmetrickeyc.decrypt(aes_key_text)
+    nonce = struct.unpack(">I", pkt.data[256:260])[0]
+    ecdhe = pkt.data[260:292]
+    ci = struct.unpack(">I", pkt.data[292:296])[0]
+    
+    aes_key = AESGCM(aes_key_text)
 
-    # --- Header 2
-    header_2 = pkt.data[4:]
+    decrypted_block = bytes(aes_key.decrypt(bytes(nonce), pkt.data[296:], ''))
 
-    derived_key = parse_header_2_block(header_2, asymmetrickeyb, ecdhe_cb)
-    nonce = struct.unpack(">I", header_2[288:292])[0]
-    header_2 = bytes(derived_key.decrypt(bytes(nonce), header_2[292:], ''))
+    ip_a = decrypted_block[:16]
 
-    derived_key = parse_header_2_block(header_2, asymmetrickeys, ecdhe_cs)
-    nonce = struct.unpack(">I", header_2[288:292])[0]
-    header_2 = bytes(derived_key.decrypt(bytes(nonce), header_2[292:], ''))
+    pkt.data = decrypted_block[16:] 
+    pkt.plen = len(pkt.data)
+    
+    pkt.dst = ip_a
 
-    derived_key = parse_header_2_block(header_2, asymmetrickeya, ecdhe_ca)
+    sockfd.sendto(bytes(pkt), (socket.inet_ntop(socket.AF_INET6, ip_a), 0))
 
     packet.drop()
 
-    global counter
-    global initial_time
-
-    final_time = time.time()
-
-    print(final_time - initial_time)
-
-    sys.stdout.flush()
-
-    if counter > 0:
-        counter -= 1
-        print(counter)
-        initial_time = time.time()
-        run()
-
-def parse_header_2_block(header_2, asymm_key, symm_key):
-    ecdhe = header_2[:288]
-
-    if not verify_signature(asymm_key, ecdhe):
-        raise Exception("Signature failure")
-
-    ecdhe = ecdhe[:32]
-
-    shared_key = symm_key.exchange(X25519PublicKey.from_public_bytes(ecdhe))
-
-    derived_key = HKDF(
-        algorithm=hashes.SHA512(),
-        length=32,
-        info=None,
-        salt=None,
-        backend=default_backend()
-    ).derive(shared_key)
-
-    derived_key = AESGCM(derived_key)
-
-    return derived_key
-
-def verify_signature(key, text):
-    msg = text[:32]
-
-    h = SHA512.new(msg)
-
-    signature = text[32:]
-
-    try:
-        PKCS1_v1_5.new(key).verify(h, signature)
-        return True
-    except (ValueError, TypeError):
-        return False
 
 def is_icmp_neighbour_message(ip_packet):
     if ip_packet.nxt != 58:
@@ -214,13 +78,18 @@ def is_icmp_neighbour_message(ip_packet):
 
     return False
 
+def sign(message, priv_key):
+    signer = PKCS1_v1_5.new(priv_key)
+    digest = SHA512.new()
+    digest.update(message)
+    return signer.sign(digest)
+
+
 nfqueue = NetfilterQueue()
 
-# 2 is the iptables rule queue number, modify is the callback function
+#run()
+
+# 1 is the iptables rule queue number, modify is the callback function
 nfqueue.bind(2, modify)
-
-initial_time = time.time()
-
-run()
 
 nfqueue.run()
