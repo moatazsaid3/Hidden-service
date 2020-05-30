@@ -32,6 +32,7 @@ def modify(packet):
         return
 
     global client_id
+   
 
     aes_key_text = pkt.data[:256]
     aes_key_text = asymmetrickeys.decrypt(aes_key_text)

@@ -20,24 +20,14 @@ import time
 keya_text = b'4p\xf8ipfD(\x99\xbb\x1d\xa2k\xeb\xaf\x05\xf0\x16\xdfGK\xb8V\xd4\xf3\x17?]S\xa0{B'
 keya = AESGCM(keya_text)
 
-keyx_text = b'\xe5Q\x92r\xe2\xfc\xde!\xa5|\x19\xb5\x99\x00\xc0\\\xe8\x0fN\xff:\xefi\x0bg\xb7\xe3\x87M\xf1`\xb1'
-keyx = AESGCM(keyx_text)
-
-keyb_text = b'}fd>@\xb21y\xd4\x88\xe0C\x9a\xab]\xd5cEL\xc5\xbc\xd9-YG\xc8\x8d\x08^r\xb9\xad'
-keyb = AESGCM(keyb_text)
-
-pubkey = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu5CGUJIk41oMpDYzZpIS\n1YV+zWje9JhP71pYmFc6bnXysYQ5L25FVQv4NJoBmXWFWMr+gadokWmKZBUoqlTZ\ngrh/42pY8Pz+WJXrNJa5wyE6rv9HoS9MGq5sS4nvt48uKzMoHfn7zrwFSifXKYZP\nvv+Fq6+fCRZh28s5Kkv2PM1xbu1zjheC0GzPwEltqJP54/axI2W4CvWraG3SLiwy\nYT3aVpSLWRInoqhHDfMQfRSsDHaUKTT01vrSPif55FCUrGbP+4rX7c/n6huG/DJN\nsBkMGnJG9A1JO0fz8YWisgdmNI8+8rIcgYRGmCLhoZq868Sn9TAX5FgdjY/3SYbD\nBQIDAQAB\n-----END PUBLIC KEY-----'
-asymmetrickeya = RSA.importKey(pubkey)
 
 pubkey = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjggW52Zpc3rQY1sQUmju\nOqKkmkQkPFdftVj1z3yspbtC2VjrOmu8MY99tR25aPU+t7TjIlVCyJbq9f6Gpt8w\n13tBqk/zi3igc+pfjs4pqyNSWcQlV2a+3l68Zp8UGWaSIKoabs6jnM+8/u0EzlAq\nwpG/jHrc/js/PuCO4ge+6oMZ9zcn/iEc1WAGHI649VeqK/yUOpPfzqsfZE52WkrH\nBLr6sxp8E/uXA8uAeF1+p0qiL7EjrF2lvDEmA7JrTLaqnwFCfRyY4IhGNYf8dAB1\n3gKbzoeE5KBLZgVEFeWuuJIuPligdlCiKwJwHm7DSS/ujoKmwx2Z3O1DgSv+65K6\nZQIDAQAB\n-----END PUBLIC KEY-----'
 asymmetrickeyx = RSA.importKey(pubkey)
 
-pubkey = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruJ2zpbGhjr+LS1eiz2f\nMvBcOcv55vWfND+/Alz9bpuDD2xMMDVvKO9LTRjEwMzyJi6i5GBpcsDblDbu3LmN\nc2iGWW9FDmOBYDAWBQtr3UO61KMBIT2iT7NcQqhPZYFy+lQgAYH6WjASlYLq/4GP\n2qKXw1MDA8NAntFq3W3aHNWlIN2wddRWGUa6d/fl1lLKT4L6DsFftuY7GQfzrBOt\nzPBxCVv8w4mU2r+Ixergy6Qjz96GXPiQvze2ZaRxW5+Ob+P8TW+JOufyEzQB3r4w\nddjUjoHiwzj72w80oDMUS3BtiVuJg0GVkJlVmKD9SuBZdIkhAQqF9WKAhy9ouJxD\nIwIDAQAB\n-----END PUBLIC KEY-----'
-asymmetrickeyb = RSA.importKey(pubkey)
+pubkeys = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu5CGUJIk41oMpDYzZpIS\n1YV+zWje9JhP71pYmFc6bnXysYQ5L25FVQv4NJoBmXWFWMr+gadokWmKZBUoqlTZ\ngrh/42pY8Pz+WJXrNJa5wyE6rv9HoS9MGq5sS4nvt48uKzMoHfn7zrwFSifXKYZP\nvv+Fq6+fCRZh28s5Kkv2PM1xbu1zjheC0GzPwEltqJP54/axI2W4CvWraG3SLiwy\nYT3aVpSLWRInoqhHDfMQfRSsDHaUKTT01vrSPif55FCUrGbP+4rX7c/n6huG/DJN\nsBkMGnJG9A1JO0fz8YWisgdmNI8+8rIcgYRGmCLhoZq868Sn9TAX5FgdjY/3SYbD\nBQIDAQAB\n-----END PUBLIC KEY-----'
+asymmetrickeys = RSA.importKey(pubkey)
 
-ecdhe_cb = X25519PrivateKey.generate()
-ecdhe_cx = X25519PrivateKey.generate()
-ecdhe_ca = X25519PrivateKey.generate()
+
 
 sockfd = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_RAW)
 sockfd.setsockopt(socket.IPPROTO_IPV6, socket.IP_HDRINCL, True)
@@ -48,68 +38,22 @@ final_time = 0
 # Run 1000 times
 counter = 1000
 
+client_id = 1
+server_id = 0
 
 def run():
     ip6_packet = dpkt.ip6.IP6()
 
     ip6_packet.src = socket.inet_pton(socket.AF_INET6, '0:0:0:0:0:0:0:0')
-    ip6_packet.dst = socket.inet_pton(socket.AF_INET6, '2100::103')
+    ip6_packet.dst = socket.inet_pton(socket.AF_INET6, '2100::106')
 
-    # Prepare Header C
-    ci_c = random.randint(0, 4294967295)
-    header_c = struct.pack(">I", ci_c)
+    data = "Hello!"
 
-    # Prepare Header B
-    header_b = asymmetrickeyb.encrypt(keyb_text, 0)[0]
+    id_From =  struct.pack(">I", client_id)
+    id_to = struct.pack(">I", server_id)
 
-    nonce_b = random.randint(0, 4294967295)
-    header_b += struct.pack(">I", nonce_b)
 
-    header_b += ecdhe_cb.public_key().public_bytes()
-
-    ci_b = random.randint(0, 4294967295)
-    header_b += struct.pack(">I", ci_b)
-
-    ip_c = socket.inet_pton(socket.AF_INET6, '2100::101')
-
-    encrypted_blob = keyb.encrypt(bytes(nonce_b), bytes(ip_c) + bytes(header_c), '')
-
-    header_b += encrypted_blob
-
-   # Prepare IP Option Middle point(X)
-    header_x = asymmetrickeyx.encrypt(keyx_text, 0)[0]
-
-    nonce_x = random.randint(0, 4294967295)
-    header_x += struct.pack(">I", nonce_x)
-
-    header_x += ecdhe_cx.public_key().public_bytes()
-
-    ci_x = random.randint(0, 4294967295)
-    header_x += struct.pack(">I", ci_x)
-
-    ip_b = socket.inet_pton(socket.AF_INET6, '2100::104')
-
-    encrypted_blob = keyx.encrypt(bytes(nonce_x), bytes(ip_b) + bytes(header_b), '')
-
-    header_x += encrypted_blob
-
-    # Prepare IP Option A
-    header_a = asymmetrickeya.encrypt(keya_text, 0)[0]
-
-    nonce_a = random.randint(0, 4294967295)
-    header_a += struct.pack(">I", nonce_a)
-
-    header_a += ecdhe_ca.public_key().public_bytes()
-
-    ci_a = random.randint(0, 4294967295)
-    header_a += struct.pack(">I", ci_a)
-
-    ip_x = socket.inet_pton(socket.AF_INET6, '2100::105')
-
-    encrypted_blob = keya.encrypt(bytes(nonce_a), bytes(ip_x) + bytes(header_x), '')
-
-    header_a += encrypted_blob
-
+    header = pubkey + id_From + id_to + asymmetrickeys.encrypt(data, 0)[0]
     
     ip6_packet.nxt = 99
     ip6_packet.p = 99
@@ -118,7 +62,7 @@ def run():
     ip6_packet.data = header_a
     ip6_packet.plen = len(ip6_packet.data)
 
-    sockfd.sendto(bytes(ip6_packet), ('2100::103', 0))
+    sockfd.sendto(bytes(ip6_packet), ('2100::106', 0))
 
 def modify(packet):
     pkt = dpkt.ip6.IP6(packet.get_payload())

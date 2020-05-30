@@ -24,27 +24,9 @@ def modify(packet):
         packet.accept()
         return
 
-    aes_key_text = pkt.data[:256]
-    aes_key_text = asymmetrickeya.decrypt(aes_key_text)
-    nonce = struct.unpack(">I", pkt.data[256:260])[0]
-    ecdhe = pkt.data[260:292]
-    ci = struct.unpack(">I", pkt.data[292:296])[0]
+    dst_ip = "2100::105"
 
-    aes_key = AESGCM(aes_key_text)
-
-    decrypted_block = bytes(aes_key.decrypt(bytes(nonce), pkt.data[296:], ''))
-
-    ip_s = decrypted_block[:16]
-
-    ecdhe_ac = X25519PrivateKey.generate()
-    signature = sign(ecdhe_ac.public_key().public_bytes(), asymmetrickeya)
-
-    pkt.data = decrypted_block[16:] + ecdhe_ac.public_key().public_bytes() + signature
-    pkt.plen = len(pkt.data)
-
-    pkt.dst = ip_s
-
-    sockfd.sendto(bytes(pkt), (socket.inet_ntop(socket.AF_INET6, ip_s), 0))
+    sockfd.sendto(bytes(pkt), (dst_ip, 0))
 
     packet.drop()
 
