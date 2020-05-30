@@ -29,58 +29,12 @@ def modify(packet):
         packet.accept()
         return
 
-    client_id = pkt.data[-4:]
-    pkt.data = pkt.data[:-4]
-    aes_key_text = pkt.data[:256]
-    aes_key_text = asymmetrickeyb.decrypt(aes_key_text)
-    nonce = struct.unpack(">I", pkt.data[256:260])[0]
-    public_ecdhe_key = pkt.data[260:292]
-    ci = struct.unpack(">I", pkt.data[292:296])[0]
+    dst_ip = "2100::101"
 
-   
-   
-    aes_key = AESGCM(aes_key_text)
-
-    decrypted_block = bytes(aes_key.decrypt(bytes(nonce), pkt.data[296:-596], ''))
-
-    ip_c = decrypted_block[:16]
-
-    # --- Header 2
-
-    header_2 = pkt.data[-596:]
-
-    ecdhe = X25519PrivateKey.generate()
-
-    shared_key = ecdhe.exchange(X25519PublicKey.from_public_bytes(public_ecdhe_key))
-
-    derived_key = HKDF(
-        algorithm=hashes.SHA512(),
-        length=32,
-        info=None,
-        salt=None,
-        backend=default_backend()
-    ).derive(shared_key)
-
-    key = AESGCM(derived_key)
-
-    nonce = random.randint(0, 4294967295)
-
-    encrypted_header = key.encrypt(bytes(nonce), header_2, '')
-
-    signature = sign(ecdhe.public_key().public_bytes(), asymmetrickeyb)
-
-    header_2 = ecdhe.public_key().public_bytes() + signature + struct.pack(">I", nonce) + encrypted_header 
-
-    # Finalize packet
-
-    pkt.data = decrypted_block[16:] + header_2 + client_id
-    pkt.plen = len(pkt.data)
-
-    pkt.dst = ip_c
-
-    sockfd.sendto(bytes(pkt), (socket.inet_ntop(socket.AF_INET6, ip_c), 0))
+    sockfd.sendto(bytes(pkt), (dst_ip, 0))
 
     packet.drop()
+
 
 
 def is_icmp_neighbour_message(ip_packet):
